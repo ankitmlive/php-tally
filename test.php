@@ -1,6 +1,6 @@
 <?php
 
-require_once("tallyIntegration.php");
+require_once("src/tallyIntegration.php");
 $host = "10.1.30.95:9000";
 $tally = new TallyIntegration($host);
 
