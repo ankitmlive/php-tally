@@ -1,4 +1,5 @@
 <?php
+//namespace TallyPHP;
 
 Class TallyIntegration
 {
@@ -33,7 +34,7 @@ Class TallyIntegration
     function getAllLedger()
     {
         //list of ledger xml query
-        $listOfLedger =<<<XML
+        $listOfLedgerXML =<<<XML
         <ENVELOPE>
             <HEADER>
                 <VERSION>1</VERSION>
@@ -73,11 +74,11 @@ Class TallyIntegration
             </BODY>
         </ENVELOPE>
 XML;
-        $ledgerList = $this->xml_execute($listOfLedger);
+        $ledgerList = $this->xml_execute($listOfLedgerXML);
         return $ledgerList["LEDGERNAME"];
     }
 
-    // create ledger 
+    // create new ledger entry in tally
     function CreateLedger($create_ledger_params)
     {
         if( count($create_ledger_params) == 0) {
@@ -198,7 +199,6 @@ XML;
         return $ledgerCreated;
     }
 
-    // Incompleted..
     //developmnet is on progress..
     function VoucherEntry($voucher_entry_params) 
     {
@@ -280,7 +280,5 @@ XML;
 
 
 }// class closed
-
-
 
 ?>

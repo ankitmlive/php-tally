@@ -1,8 +1,12 @@
 <?php
 
+//use TallyPHP\TallyIntegration;
 require_once("src/tallyIntegration.php");
+
 $host = "10.1.30.95:9000";
 $tally = new TallyIntegration($host);
+
+echo $tally;die();
 
 //parametrs from application
 $billing_user = "Imran2222";
