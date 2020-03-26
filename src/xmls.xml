@@ -1,0 +1,764 @@
+// fetch single voucher from vocher number
+
+<ENVELOPE>  
+  <HEADER>  
+    <VERSION>1</VERSION>  
+    <TALLYREQUEST>  EXPORT</TALLYREQUEST>  
+    <TYPE>COLLECTION</TYPE>  
+    <ID>  RTSAllVouchers_FilterForVchNoAndVchType</ID>  
+  </HEADER>  
+  <BODY>  
+    <DESC>  
+      <STATICVARIABLES>  
+        <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>  
+        <!-- TODO : Specify the VoucherNo -->  
+        <RTS_KEY>VCH-INV-1</RTS_KEY>  
+        <!-- TODO : Specify the VoucherType here -->  
+        <RTS_VOUCHERTYPENAME>Sales</RTS_VOUCHERTYPENAME>  
+      </STATICVARIABLES>  
+      <TDL>  
+        <TDLMESSAGE>  
+          <!-- Retrieve all Vouchers for specified VoucherNo and VoucherType -->  
+          <COLLECTION NAME="RTSAllVouchers_FilterForVchNoAndVchType" ISINITIALIZE="Yes">  
+              <TYPE>Voucher</TYPE>  
+              <FETCH>ALLLEDGERENTRIES.*</FETCH>  
+              <FETCH>ALLINVENTORYENTRIES.*</FETCH>  
+              <FILTER>RTS_FilterForVchNoAndVchType</FILTER>  
+          </COLLECTION>  
+          <VARIABLE NAME="RTS_KEY">  
+            <TYPE> String</TYPE>  
+          </VARIABLE>  
+          <VARIABLE NAME="RTS_VOUCHERTYPENAME">  
+            <TYPE>String</TYPE>  
+          </VARIABLE>  
+          <SYSTEM TYPE="FORMULAE" NAME="RTS_FilterForVchNoAndVchType">  
+            $VoucherNumber = $$String:##RTS_KEY and $VoucherTypeName = $$String:##RTS_VOUCHERTYPENAME
+          </SYSTEM>  
+        </TDLMESSAGE>  
+      </TDL>  
+    </DESC>  
+  </BODY>  
+</ENVELOPE>  
+
+// voucher entry code
+$res_str =<<<XML
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Import</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>Vouchers</ID>
+    </HEADER>
+
+    <BODY>
+        <DESC>
+        </DESC>
+        <DATA>
+            <TALLYMESSAGE>
+                <VOUCHER>
+                    <DATE>20191111</DATE>
+                    <NARRATION>{$description}</NARRATION>
+                    <STATENAME>{$state}</STATENAME>
+                    <COUNTRYOFRESIDENCE>{$country}</COUNTRYOFRESIDENCE>
+                    <PARTYNAME>{$billing_user}</PARTYNAME>
+                    <VOUCHERTYPENAME>SALES</VOUCHERTYPENAME>
+                    <REFERENCE>{$invoice_number}</REFERENCE>
+                    <VOUCHERNUMBER>Nms/gps/1000</VOUCHERNUMBER>
+                    <PARTYLEDGERNAME>{$billing_user}</PARTYLEDGERNAME>
+                    <BASICBASEPARTYNAME>{$billing_user}</BASICBASEPARTYNAME>
+
+                    <ALLLEDGERENTRIES.LIST> 
+                        <LEDGERNAME>{$billing_user}</LEDGERNAME>
+                        <GSTCLASS/>
+                        <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                        <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                        <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                        <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+                        <ISLASTDEEMEDPOSITIVE>Yes</ISLASTDEEMEDPOSITIVE>
+                        <ISCAPVATTAXALTERED>No</ISCAPVATTAXALTERED>
+                        <ISCAPVATNOTCLAIMED>No</ISCAPVATNOTCLAIMED>
+                        <AMOUNT>-{$amount}</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+
+                    <ALLLEDGERENTRIES.LIST>
+                        <LEDGERNAME>CASH</LEDGERNAME> 
+                        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE> 
+                        <AMOUNT>{$amount}</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+                </VOUCHER>
+            </TALLYMESSAGE>
+        </DATA>
+    </BODY>
+</ENVELOPE>
+XML;
+
+//final voucher entry code
+
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Import</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>Vouchers</ID>
+    </HEADER>
+
+    <BODY>
+        <DESC>
+        </DESC>
+        <DATA>
+            <TALLYMESSAGE>
+                <VOUCHER>
+                    <DATE>{$date}</DATE>
+                    <NARRATION>{$description}</NARRATION>
+                    <STATENAME>{$state}</STATENAME>
+                    <COUNTRYOFRESIDENCE>{$country}</COUNTRYOFRESIDENCE>
+                    <PARTYNAME>{$billing_user}</PARTYNAME>
+                    <VOUCHERTYPENAME>SALES</VOUCHERTYPENAME>
+                    <REFERENCE>{$invoice_number}</REFERENCE>
+                    <VOUCHERNUMBER>20</VOUCHERNUMBER>
+                    <PARTYLEDGERNAME>{$billing_user}</PARTYLEDGERNAME>
+                    <BASICBASEPARTYNAME>{$billing_user}</BASICBASEPARTYNAME>
+
+
+                    <ALLLEDGERENTRIES.LIST> 
+                        <LEDGERNAME>{$billing_user}</LEDGERNAME>
+                        <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                        <AMOUNT>-{$amount}</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+
+                    {$ledger_entry}
+                
+                </VOUCHER>
+            </TALLYMESSAGE>
+        </DATA>
+    </BODY>
+</ENVELOPE>
+
+// vocher entry taxes code
+
+                    <ALLLEDGERENTRIES.LIST>
+                        <LEDGERNAME>Local Sale    18%</LEDGERNAME> 
+                        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE> 
+                        <AMOUNT>20</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+
+                    <ALLLEDGERENTRIES.LIST>
+                        <LEDGERNAME>Input CGST @9%</LEDGERNAME> 
+                        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE> 
+                        <AMOUNT>1.8</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+
+                    <ALLLEDGERENTRIES.LIST>
+                        <LEDGERNAME>Input SGST @9%</LEDGERNAME> 
+                        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE> 
+                        <AMOUNT>1.8</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+
+
+//old ledger creation code
+
+<ENVELOPE>
+<HEADER>
+<TALLYREQUEST>Import Data</TALLYREQUEST>
+</HEADER>
+<BODY>
+<IMPORTDATA>
+<REQUESTDESC>
+<REPORTNAME>All Masters</REPORTNAME>
+</REQUESTDESC>
+<REQUESTDATA>
+
+<!-- Create Ledger named "Cash" if it does not exist -->
+<TALLYMESSAGE xmlns:UDF="TallyUDF">
+  <LEDGER NAME="{$billing_user}" ACTION="Create">
+    <NAME.LIST>
+      <NAME>{$billing_user}</NAME>
+    </NAME.LIST>
+    <PARENT>Sundry Debtors</PARENT>
+    <ISBILLWISEON>No</ISBILLWISEON>
+    <AFFECTSSTOCK>No</AFFECTSSTOCK>
+    <OPENINGBALANCE>0</OPENINGBALANCE>
+    <USEFORVAT>No </USEFORVAT>
+    <TAXCLASSIFICATIONNAME/>
+    <TAXTYPE/>
+    <RATEOFTAXCALCULATION/>
+  </LEDGER>
+</TALLYMESSAGE>
+
+</REQUESTDATA>
+
+</IMPORTDATA>
+</BODY>
+</ENVELOPE>
+
+
+
+
+
+
+
+
+
+
+
+
+<VOUCHER REMOTEID="" VCHTYPE="Receipt" ACTION="Create" OBJVIEW="Accounting Voucher View">
+        <OLDAUDITENTRYIDS.LIST TYPE="Number">
+           <OLDAUDITENTRYIDS>-1</OLDAUDITENTRYIDS>
+        </OLDAUDITENTRYIDS.LIST>
+    <DATE>20160912</DATE>
+    <GUID/>
+    <NARRATION>being EMI collected for the month of September, 2016</NARRATION>
+    <TAXUNITNAME>Default Tax Unit</TAXUNITNAME>
+    <VOUCHERTYPENAME>Receipt</VOUCHERTYPENAME>
+    <VOUCHERNUMBER>179</VOUCHERNUMBER>
+    <PARTYLEDGERNAME>2016200288 Dr&apos;s Led B Divya Darshini&#13;&#10;</PARTYLEDGERNAME>
+    <CSTFORMISSUETYPE/>
+    <CSTFORMRECVTYPE/>
+    <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
+    <PERSISTEDVIEW>Accounting Voucher View</PERSISTEDVIEW>
+    <VCHGSTCLASS/>
+    <ENTEREDBY>manoj</ENTEREDBY>      
+    <EFFECTIVEDATE>20160912</EFFECTIVEDATE>
+    <HASCASHFLOW>Yes</HASCASHFLOW>
+    <ENTEREDBY>SYSTEM</ENTEREDBY>
+
+    <ALLLEDGERENTRIES.LIST>
+        <LEDGERNAME>2016200288 Dr&apos;s Led B Divya Darshini&#13;&#10;</LEDGERNAME>
+        <GSTCLASS/>
+        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        <AMOUNT>1692</AMOUNT>
+        <CATEGORY>Chennai Branch</CATEGORY>
+    </ALLLEDGERENTRIES.LIST>
+
+    <ALLLEDGERENTRIES.LIST>
+        <OLDAUDITENTRYIDS.LIST TYPE="Number">
+            <OLDAUDITENTRYIDS>-1</OLDAUDITENTRYIDS>
+        </OLDAUDITENTRYIDS.LIST>
+    <LEDGERNAME>ABC Bank Ltd- A/c No.1234567890</LEDGERNAME>
+    <GSTCLASS/>
+    <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+    <LEDGERFROMITEM>No</LEDGERFROMITEM>
+    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+    <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+    <ISLASTDEEMEDPOSITIVE>Yes</ISLASTDEEMEDPOSITIVE>
+    <AMOUNT>-1692</AMOUNT>
+
+    // bank account section xml
+    <BANKALLOCATIONS.LIST>
+            <DATE>20160912</DATE>
+            <INSTRUMENTDATE></INSTRUMENTDATE>
+            <NAME>757a0139-500d-4431-9557-9faa864bada7</NAME>
+            <TRANSACTIONTYPE>Cheque/DD</TRANSACTIONTYPE>
+            <PAYMENTFAVOURING>2016200288 Dr&apos;s Led B Divya Darshini&#13;&#10;</PAYMENTFAVOURING>
+            <UNIQUEREFERENCENUMBER>3IwbWyz4z226QiK8</UNIQUEREFERENCENUMBER>
+            <PAYMENTMODE>Transacted</PAYMENTMODE>
+            <STATUS>No</STATUS>
+            <CHEQUEPRINTED> 1</CHEQUEPRINTED>
+            <AMOUNT>-1692</AMOUNT>
+    </BANKALLOCATIONS.LIST>
+
+    </ALLLEDGERENTRIES.LIST>
+
+    </VOUCHER>
+
+    </TALLYMESSAGE>
+    </REQUESTDATA>
+    </IMPORTDATA>
+
+    </BODY>
+</ENVELOPE>
+
+
+
+
+
+//**********************find particular Voucher******************
+<ENVELOPE>
+  <HEADER>
+    <VERSION>1</VERSION>
+    <TALLYREQUEST>EXPORT</TALLYREQUEST>
+    <TYPE>COLLECTION</TYPE>
+    <ID>FindParticularVoucher</ID>
+  </HEADER>
+  <BODY>
+    <DESC>
+      <STATICVARIABLES>
+        <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+        <SVCURRENTCOMPANY>FOO COMPANY</SVCURRENTCOMPANY>
+        <VCHNO>ABC1234</VCHNO>
+      </STATICVARIABLES>
+      <TDL>
+        <TDLMESSAGE>
+          <COLLECTION NAME="FindParticularVoucher" ISINITIALIZE="YES">
+            <TYPE>Voucher</TYPE>
+            <FILTER>GetInvoiceVoucher</FILTER>
+          </COLLECTION>
+          <VARIABLE NAME="VCHNO">
+            <TYPE>String</TYPE>
+          </VARIABLE>
+          <SYSTEM TYPE="FORMULAE" NAME="GetInvoiceVoucher">$VoucherNumber = $$String:##VCHNO</SYSTEM>
+        </TDLMESSAGE>
+      </TDL>
+    </DESC>
+  </BODY>
+</ENVELOPE>
+
+
+//*************************--ledger creation --*****************************
+ <HEADER>
+    <VERSION>1</VERSION>
+    <TALLYREQUEST>IMPORT</TALLYREQUEST>
+    <TYPE>DATA</TYPE>
+    <ID>ALL MASTERS</ID>
+  </HEADER>
+   <BODY>
+    <DESC>
+      <STATICVARIABLES>
+        <SVCURRENTCOMPANY>Test</SVCURRENTCOMPANY>
+      </STATICVARIABLES>
+    </DESC>
+    <DATA>
+      <TALLYMESSAGE>
+      <LEDGER NAME="name2" RESERVEDNAME="">
+
+            <ADDRESS.LIST TYPE="String">
+              <ADDRESS>line1, line2</ADDRESS>
+              <ADDRESS>city</ADDRESS>
+            </ADDRESS.LIST>
+
+            <LEDSTATENAME>Goa</LEDSTATENAME>
+
+            <PINCODE>403001</PINCODE>
+
+            <MAILINGNAME.LIST TYPE="String">
+              <MAILINGNAME>name2</MAILINGNAME>
+            </MAILINGNAME.LIST>
+
+            <CURRENCYNAME>₹</CURRENCYNAME>
+
+            <EMAIL>testvira@email.com</EMAIL>
+
+            <WEBSITE />
+
+            <INCOMETAXNUMBER>LSWI2278DF</INCOMETAXNUMBER>
+
+            <COUNTRYNAME>India</COUNTRYNAME>
+
+            <GSTREGISTRATIONTYPE>Regular</GSTREGISTRATIONTYPE>
+
+            <PARENT>Sundry Debtors - Viras</PARENT>
+
+            <NARRATION />
+            
+            <COUNTRYOFRESIDENCE>India</COUNTRYOFRESIDENCE>
+            <EMAILCC>mysteryman@email.com</EMAILCC>
+            <LEDGERPHONE>458923</LEDGERPHONE>
+            <LEDGERCONTACT>Mystery Man</LEDGERCONTACT>
+            <LEDGERMOBILE>6598765987</LEDGERMOBILE>
+            <PARTYGSTIN>ASDF234kl56</PARTYGSTIN>
+            <GSTNATUREOFSUPPLY>SEZ</GSTNATUREOFSUPPLY>
+
+            <LANGUAGENAME.LIST>
+              <NAME.LIST TYPE="String">
+                <NAME>name2</NAME>
+                <NAME>new name2</NAME>
+              </NAME.LIST>
+              <LANGUAGEID>1033</LANGUAGEID>
+            </LANGUAGENAME.LIST>
+
+            <PAYMENTDETAILS.LIST>
+              <IFSCODE>ifsc code</IFSCODE>
+              <BANKNAME>ScamNo1</BANKNAME>
+              <ACCOUNTNUMBER>123456789</ACCOUNTNUMBER>
+              <PAYMENTFAVOURING>name2</PAYMENTFAVOURING>
+              <TRANSACTIONNAME>E-Payment</TRANSACTIONNAME>
+              <SETASDEFAULT>No</SETASDEFAULT>
+              <DEFAULTTRANSACTIONTYPE>Inter Bank Transfer</DEFAULTTRANSACTIONTYPE>
+              <BENEFICIARYCODEDETAILS.LIST />
+            </PAYMENTDETAILS.LIST>
+
+            <LEDMULTIADDRESSLIST.LIST>
+              <ADDRESS.LIST TYPE="String">
+                <ADDRESS>Door No 1</ADDRESS>
+                <ADDRESS>Road No 1</ADDRESS>
+                <ADDRESS>Semmedu</ADDRESS>
+              </ADDRESS.LIST>
+              <EMAIL />
+              <STATE>Tamil Nadu</STATE>
+              <PINCODE>641114</PINCODE>
+              <INCOMETAXNUMBER>LSWI2278DF</INCOMETAXNUMBER>
+              <COUNTRYNAME>India</COUNTRYNAME>
+              <GSTREGISTRATIONTYPE>Regular</GSTREGISTRATIONTYPE>
+              <ADDRESSNAME>City Office</ADDRESSNAME>
+              <PARTYGSTIN>ASDF234kl56</PARTYGSTIN>
+              <CONTACTPERSON>maverick</CONTACTPERSON>
+              <ISOTHTERRITORYASSESSEE>No</ISOTHTERRITORYASSESSEE>
+            </LEDMULTIADDRESSLIST.LIST>
+
+            <LEDMULTIADDRESSLIST.LIST>
+              <ADDRESS.LIST TYPE="String">
+                <ADDRESS>Door No 1</ADDRESS>
+                <ADDRESS>Road No 1</ADDRESS>
+                <ADDRESS>Semmedu</ADDRESS>
+              </ADDRESS.LIST>
+              <EMAIL />
+              <STATE>Tamil Nadu</STATE>
+              <PINCODE>641114</PINCODE>
+              <INCOMETAXNUMBER>LSWI2278DF</INCOMETAXNUMBER>
+              <COUNTRYNAME>India</COUNTRYNAME>
+              <GSTREGISTRATIONTYPE>Regular</GSTREGISTRATIONTYPE>
+              <ADDRESSNAME>Godown</ADDRESSNAME>
+              <PARTYGSTIN>ASDF234kl56</PARTYGSTIN>
+              <CONTACTPERSON>maverick</CONTACTPERSON>
+              <ISOTHTERRITORYASSESSEE>No</ISOTHTERRITORYASSESSEE>
+            </LEDMULTIADDRESSLIST.LIST>
+
+            </ledger>
+        </TALLYMESSAGE>
+    <DATA>
+  </BODY>
+
+  // my collection xml code
+
+<ENVELOPE>
+       <HEADER>
+            <VERSION>1</VERSION>
+            <TALLYREQUEST>EXPORT</TALLYREQUEST>
+            <TYPE>OBJECT</TYPE>
+            <ID>aaaa</ID>
+       </HEADER>
+       <BODY>
+            <DESC>
+            <STATICVARIABLES> <SVEXPORTFORMAT>\$\$SysName:XML</SVEXPORTFORMAT>
+            </STATICVARIABLES>
+
+            <FETCHLIST>
+                <FETCH>Name</FETCH>
+            </FETCHLIST>
+
+            <TDL>
+            <TDLMESSAGE>
+                <OBJECT NAME="aaaa" ISINITIALIZE="Yes">
+                    <SUBTYPE>Ledger</SUBTYPE>
+                    <CHILDOF>\$\$GroupSundryCreditors</CHILDOF> 
+                </OBJECT>
+            </TDLMESSAGE>
+            </TDL>
+            </DESC>
+            </BODY>
+</ENVELOPE>
+
+
+//list of ledgers xml code
+
+<ENVELOPE>
+  <HEADER>
+    <VERSION>1</VERSION>
+    <TALLYREQUEST>Export</TALLYREQUEST>
+    <TYPE>Data</TYPE>
+    <ID>List of Ledgers</ID>
+  </HEADER>
+  <BODY>
+    <DESC>
+      <TDL>
+        <TDLMESSAGE>
+          <REPORT NAME="List of Ledgers" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+            <FORMS>List of Ledgers</FORMS> 
+          </REPORT>
+          <FORM NAME="List of Ledgers" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+            <TOPPARTS>List of Ledgers</TOPPARTS> 
+            <XMLTAG>"List of Ledgers"</XMLTAG> 
+          </FORM>
+          <PART NAME="List of Ledgers" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+            <TOPLINES>List of Ledgers</TOPLINES> 
+            <REPEAT>List of Ledgers : Collection of Ledgers</REPEAT> 
+            <SCROLLED>Vertical</SCROLLED> 
+          </PART>
+          <LINE NAME="List of Ledgers" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+            <LEFTFIELDS>List of Ledgers</LEFTFIELDS> 
+          </LINE>
+          <FIELD NAME="List of Ledgers" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+            <SET>\$Name</SET> 
+            <XMLTAG>"NAME"</XMLTAG> 
+          </FIELD>
+          <COLLECTION NAME="Collection of Ledgers" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+            <TYPE>Ledger</TYPE> 
+          </COLLECTION>
+        </TDLMESSAGE>
+      </TDL>
+    </DESC>
+  </BODY>
+</ENVELOPE>
+
+
+// create voucher entry with new specs:
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Import</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>Vouchers</ID>
+    </HEADER>
+
+    <BODY>
+        <DESC>
+        </DESC>
+        <DATA>
+            <TALLYMESSAGE>
+                <VOUCHER>
+                    <DATE>20080402</DATE>
+                    <NARRATION>Ch. No. Tested</NARRATION> 
+                    <VOUCHERTYPENAME>Payment</VOUCHERTYPENAME> 
+                    <VOUCHERNUMBER>1</VOUCHERNUMBER>
+                    <ALLLEDGERENTRIES.LIST> 
+                        <LEDGERNAME>Conveyance</LEDGERNAME> 
+                        <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE> 
+                        <AMOUNT>-12000.00</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+                    <ALLLEDGERENTRIES.LIST>
+                        <LEDGERNAME>Bank of India</LEDGERNAME> 
+                        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE> 
+                        <AMOUNT>12000.00</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+                </VOUCHER>
+            </TALLYMESSAGE>
+        </DATA>
+    </BODY>
+</ENVELOPE>
+
+
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Import</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>Vouchers</ID>
+    </HEADER>
+
+    <BODY>
+        <DESC>
+        </DESC>
+        <DATA>
+            <TALLYMESSAGE>
+                <VOUCHER>
+                    <DATE>{$date}</DATE>
+                    <NARRATION>{$description}</NARRATION>
+                    <STATENAME>{$state}</STATENAME>
+                    <COUNTRYOFRESIDENCE>{$country}</COUNTRYOFRESIDENCE>
+                    <PARTYNAME>{$billing_user}</PARTYNAME>
+                    <VOUCHERTYPENAME>SALES</VOUCHERTYPENAME>
+                    <REFERENCE>{$invoice_number}</REFERENCE>
+                    <VOUCHERNUMBER>1</VOUCHERNUMBER>
+                    <PARTYLEDGERNAME>{$billing_user}</PARTYLEDGERNAME>
+                    <BASICBASEPARTYNAME>{$billing_user}</BASICBASEPARTYNAME>
+
+
+                    <ALLLEDGERENTRIES.LIST> 
+                        <LEDGERNAME>{$billing_user}</LEDGERNAME>
+                        <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                        <AMOUNT>-{$amount}</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+
+                    <ALLLEDGERENTRIES.LIST>
+                        <LEDGERNAME>CASH</LEDGERNAME> 
+                        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE> 
+                        <AMOUNT>{$amount}</AMOUNT>
+                    </ALLLEDGERENTRIES.LIST>
+
+                </VOUCHER>
+            </TALLYMESSAGE>
+        </DATA>
+    </BODY>
+</ENVELOPE>
+
+
+// voucher entry code 
+
+<ENVELOPE>
+		  <HEADER>
+			<TALLYREQUEST>Import Data</TALLYREQUEST>
+		  </HEADER>
+		  <BODY>
+			<IMPORTDATA>
+			  <REQUESTDESC>
+				<REPORTNAME>Vouchers</REPORTNAME>
+				<STATICVARIABLES>
+				 <SVCURRENTCOMPANY>SAVH</SVCURRENTCOMPANY>
+				</STATICVARIABLES>
+			  </REQUESTDESC>
+			  <REQUESTDATA>
+				<TALLYMESSAGE xmlns:UDF="TallyUDF">
+				  <VOUCHER REMOTEID="123" VCHTYPE="Receipt" VCHKEY="321" ACTION="Create" OBJVIEW="Accounting Voucher View">
+					<OLDAUDITENTRIES.LIST>    </OLDAUDITENTRIES.LIST>
+					<ACCOUNTAUDITENTRIES.LIST>    </ACCOUNTAUDITENTRIES.LIST>
+					<AUDITENTRIES.LIST>    </AUDITENTRIES.LIST>
+					<OLDAUDITENTRYIDS.LIST TYPE="Number">
+					  <OLDAUDITENTRYIDS>-1</OLDAUDITENTRYIDS>
+					</OLDAUDITENTRYIDS.LIST>
+					<DATE>20130401</DATE>
+					<GUID>f6c10ce3-4a15-42b8-961e-143a512a9e62-00000009</GUID>
+					<VOUCHERTYPENAME>Receipt</VOUCHERTYPENAME>
+					<VOUCHERNUMBER>5</VOUCHERNUMBER>
+					<PARTYLEDGERNAME>'.$name.'</PARTYLEDGERNAME>
+					<CSTFORMISSUETYPE/>
+					<CSTFORMRECVTYPE/>
+					<FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
+					<PERSISTEDVIEW>Accounting Voucher View</PERSISTEDVIEW>
+					<VCHGSTCLASS/>
+					<DIFFACTUALQTY>No</DIFFACTUALQTY>
+					<AUDITED>No</AUDITED>
+					<FORJOBCOSTING>No</FORJOBCOSTING>
+					<ISOPTIONAL>No</ISOPTIONAL>
+					<EFFECTIVEDATE>20130401</EFFECTIVEDATE>
+					<ISFORJOBWORKIN>No</ISFORJOBWORKIN>
+					<ALLOWCONSUMPTION>No</ALLOWCONSUMPTION>
+					<USEFORINTEREST>No</USEFORINTEREST>
+					<USEFORGAINLOSS>No</USEFORGAINLOSS>
+					<USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
+					<USEFORCOMPOUND>No</USEFORCOMPOUND>
+					<ALTERID>20</ALTERID>
+					<EXCISEOPENING>No</EXCISEOPENING>
+					<USEFORFINALPRODUCTION>No</USEFORFINALPRODUCTION>
+					<ISCANCELLED>No</ISCANCELLED>
+					<HASCASHFLOW>Yes</HASCASHFLOW>
+					<ISPOSTDATED>No</ISPOSTDATED>
+					<USETRACKINGNUMBER>No</USETRACKINGNUMBER>
+					<ISINVOICE>No</ISINVOICE>
+					<MFGJOURNAL>No</MFGJOURNAL>
+					<HASDISCOUNTS>No</HASDISCOUNTS>
+					<ASPAYSLIP>No</ASPAYSLIP>
+					<ISCOSTCENTRE>No</ISCOSTCENTRE>
+					<ISSTXNONREALIZEDVCH>No</ISSTXNONREALIZEDVCH>
+					<ISEXCISEMANUFACTURERON>No</ISEXCISEMANUFACTURERON>
+					<ISBLANKCHEQUE>No</ISBLANKCHEQUE>
+					<ISDELETED>No</ISDELETED>
+					<ASORIGINAL>No</ASORIGINAL>
+					<VCHISFROMSYNC>No</VCHISFROMSYNC>
+					<MASTERID>9</MASTERID>
+					<VOUCHERKEY>177657027231784</VOUCHERKEY>
+					<INVOICEDELNOTES.LIST>    </INVOICEDELNOTES.LIST>
+					<INVOICEORDERLIST.LIST>    </INVOICEORDERLIST.LIST>
+					<INVOICEINDENTLIST.LIST>    </INVOICEINDENTLIST.LIST>
+					<ATTENDANCEENTRIES.LIST>    </ATTENDANCEENTRIES.LIST>
+					<ORIGINVOICEDETAILS.LIST>    </ORIGINVOICEDETAILS.LIST>
+					<INVOICEEXPORTLIST.LIST>    </INVOICEEXPORTLIST.LIST>
+					<ALLLEDGERENTRIES.LIST>
+					  <AMOUNT>200000.00</AMOUNT>
+					  <OLDAUDITENTRYIDS.LIST TYPE="Number">
+						<OLDAUDITENTRYIDS>-1</OLDAUDITENTRYIDS>
+					  </OLDAUDITENTRYIDS.LIST>
+					  <LEDGERNAME>'.$name.'</LEDGERNAME>
+					  <GSTCLASS/>
+					  <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+					  <LEDGERFROMITEM>No</LEDGERFROMITEM>
+					 <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+					  <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+					 <ISLASTDEEMEDPOSITIVE>No</ISLASTDEEMEDPOSITIVE>
+					  <BANKALLOCATIONS.LIST></BANKALLOCATIONS.LIST>
+					  <BILLALLOCATIONS.LIST></BILLALLOCATIONS.LIST>
+					  <INTERESTCOLLECTION.LIST></INTERESTCOLLECTION.LIST>
+					  <OLDAUDITENTRIES.LIST></OLDAUDITENTRIES.LIST>
+					  <ACCOUNTAUDITENTRIES.LIST></ACCOUNTAUDITENTRIES.LIST>
+					  <AUDITENTRIES.LIST></AUDITENTRIES.LIST>
+					  <TAXBILLALLOCATIONS.LIST></TAXBILLALLOCATIONS.LIST>
+					  <TAXOBJECTALLOCATIONS.LIST></TAXOBJECTALLOCATIONS.LIST>
+					  <TDSEXPENSEALLOCATIONS.LIST></TDSEXPENSEALLOCATIONS.LIST>
+					  <VATSTATUTORYDETAILS.LIST></VATSTATUTORYDETAILS.LIST>
+					  <COSTTRACKALLOCATIONS.LIST></COSTTRACKALLOCATIONS.LIST>
+					</ALLLEDGERENTRIES.LIST>
+					<ALLLEDGERENTRIES.LIST>
+					  <OLDAUDITENTRYIDS.LIST TYPE="Number">
+						<OLDAUDITENTRYIDS>-1</OLDAUDITENTRYIDS>
+					  </OLDAUDITENTRYIDS.LIST>
+					  <LEDGERNAME>Bank of Maharashtra</LEDGERNAME>
+					  <GSTCLASS/>
+					  <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+					  <LEDGERFROMITEM>No</LEDGERFROMITEM>
+					 <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+					  <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+					 <ISLASTDEEMEDPOSITIVE>Yes</ISLASTDEEMEDPOSITIVE>
+					  <AMOUNT>-200000.00</AMOUNT>
+					  <BANKALLOCATIONS.LIST>
+						<DATE>20130401</DATE>
+						<INSTRUMENTDATE>20130401</INSTRUMENTDATE>
+						<BANKBRANCHNAME>Warje</BANKBRANCHNAME>
+						<TRANSACTIONTYPE>Cheque/DD</TRANSACTIONTYPE>
+						<BANKNAME>AXIS</BANKNAME>
+						<PAYMENTFAVOURING>'.$name.'</PAYMENTFAVOURING>
+						<INSTRUMENTNUMBER>50026</INSTRUMENTNUMBER>
+						<UNIQUEREFERENCENUMBER>38ROUrdV00QEKOhl</UNIQUEREFERENCENUMBER>
+						<STATUS>No</STATUS>
+						<CHEQUEPRINTED>-1</CHEQUEPRINTED>
+						<AMOUNT>-200000.00</AMOUNT>
+					  </BANKALLOCATIONS.LIST>
+					  <BILLALLOCATIONS.LIST></BILLALLOCATIONS.LIST>
+					  <INTERESTCOLLECTION.LIST></INTERESTCOLLECTION.LIST>
+					  <OLDAUDITENTRIES.LIST></OLDAUDITENTRIES.LIST>
+					  <ACCOUNTAUDITENTRIES.LIST></ACCOUNTAUDITENTRIES.LIST>
+					  <AUDITENTRIES.LIST></AUDITENTRIES.LIST>
+					  <TAXBILLALLOCATIONS.LIST></TAXBILLALLOCATIONS.LIST>
+					  <TAXOBJECTALLOCATIONS.LIST></TAXOBJECTALLOCATIONS.LIST>
+					  <TDSEXPENSEALLOCATIONS.LIST></TDSEXPENSEALLOCATIONS.LIST>
+					  <VATSTATUTORYDETAILS.LIST> </VATSTATUTORYDETAILS.LIST>
+					  <COSTTRACKALLOCATIONS.LIST> </COSTTRACKALLOCATIONS.LIST>
+					</ALLLEDGERENTRIES.LIST>
+					<ATTDRECORDS.LIST> </ATTDRECORDS.LIST>
+				  </VOUCHER>
+				</TALLYMESSAGE>
+				<TALLYMESSAGE xmlns:UDF="TallyUDF">
+				  <COMPANY>
+					<REMOTECMPINFO.LIST MERGE="Yes">
+					  <NAME>12</NAME>
+					  <REMOTECMPNAME>SAVH</REMOTECMPNAME>
+					 <REMOTECMPSTATE>Maharashtra</REMOTECMPSTATE>
+					</REMOTECMPINFO.LIST>
+					<REMOTECMPINFO.LIST MERGE="Yes">
+					  <NAME>f6c10ce3-4a15-42b8-961e-143a512a9e62</NAME>
+					  <REMOTECMPNAME>SAVH</REMOTECMPNAME>
+					 <REMOTECMPSTATE>Maharashtra</REMOTECMPSTATE>
+					</REMOTECMPINFO.LIST>
+				  </COMPANY>
+				</TALLYMESSAGE>
+				<TALLYMESSAGE xmlns:UDF="TallyUDF">
+				  <COMPANY>
+					<REMOTECMPINFO.LIST MERGE="Yes">
+					  <NAME>12</NAME>
+					  <REMOTECMPNAME>SAVH</REMOTECMPNAME>
+					 <REMOTECMPSTATE>Maharashtra</REMOTECMPSTATE>
+					</REMOTECMPINFO.LIST>
+					<REMOTECMPINFO.LIST MERGE="Yes">
+					  <NAME>f6c10ce3-4a15-42b8-961e-143a512a9e62</NAME>
+					  <REMOTECMPNAME>SAVH</REMOTECMPNAME>
+					 <REMOTECMPSTATE>Maharashtra</REMOTECMPSTATE>
+					</REMOTECMPINFO.LIST>
+				  </COMPANY>
+				</TALLYMESSAGE>
+			  </REQUESTDATA>
+			</IMPORTDATA>
+		  </BODY>
+		</ENVELOPE>';
+
+    //all ledger list under sundry debtors
+
+    <ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>EXPORT</TALLYREQUEST>
+        <TYPE>COLLECTION</TYPE>
+        <ID>SundryDebtorsLedgers</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <TDL>
+                <TDLMESSAGE>
+                    <COLLECTION NAME="SundryDebtorsLedgers">
+                        <TYPE>Ledger</TYPE>
+                        <CHILDOF>$$GroupSundryDebtors</CHILDOF>
+                        <FETCH>Name, Parent, ClosingBalance</FETCH>
+                    </COLLECTION>
+                </TDLMESSAGE>   
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>
